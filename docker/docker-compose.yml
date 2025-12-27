@@ -1,0 +1,84 @@
+services:
+  pg1:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - pg1_data:/var/lib/postgresql/data
+    networks: [kvft]
+
+  pg2:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - pg2_data:/var/lib/postgresql/data
+    networks: [kvft]
+
+  pg3:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - pg3_data:/var/lib/postgresql/data
+    networks: [kvft]
+
+  node1:
+    build:
+      context: ..
+      dockerfile: docker/node1/Dockerfile
+    environment:
+      NODE_ID: "1"
+      ROLE: "leader"
+      PORT: ${NODE1_PORT}
+      DB_URL: postgres://${PG_USER}:${PG_PASSWORD}@pg1:5432/${PG_DB}?sslmode=disable
+      PEERS: http://node2:${NODE2_PORT},http://node3:${NODE3_PORT}
+    ports:
+      - "${NODE1_PORT}:${NODE1_PORT}"
+    depends_on: [pg1]
+    networks: [kvft]
+
+  node2:
+    build:
+      context: ..
+      dockerfile: docker/node2/Dockerfile
+    environment:
+      NODE_ID: "2"
+      ROLE: "follower"
+      PORT: ${NODE2_PORT}
+      DB_URL: postgres://${PG_USER}:${PG_PASSWORD}@pg2:5432/${PG_DB}?sslmode=disable
+      LEADER_URL: http://node1:${NODE1_PORT}
+    ports:
+      - "${NODE2_PORT}:${NODE2_PORT}"
+    depends_on: [pg2]
+    networks: [kvft]
+
+  node3:
+    build:
+      context: ..
+      dockerfile: docker/node3/Dockerfile
+    environment:
+      NODE_ID: "3"
+      ROLE: "follower"
+      PORT: ${NODE3_PORT}
+      DB_URL: postgres://${PG_USER}:${PG_PASSWORD}@pg3:5432/${PG_DB}?sslmode=disable
+      LEADER_URL: http://node1:${NODE1_PORT}
+    ports:
+      - "${NODE3_PORT}:${NODE3_PORT}"
+    depends_on: [pg3]
+    networks: [kvft]
+
+volumes:
+  pg1_data:
+  pg2_data:
+  pg3_data:
+
+networks:
+  kvft:
+    driver: bridge

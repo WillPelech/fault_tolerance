@@ -1,0 +1,48 @@
+# ----------------------
+# Secrets / generated config
+# ----------------------
+docker/.env
+.env
+
+# ----------------------
+# Python
+# ----------------------
+.venv/
+__pycache__/
+*.pyc
+
+# ----------------------
+# Go
+# ----------------------
+bin/
+*.exe
+*.out
+*.test
+
+# ----------------------
+# Go build cache (optional)
+# ----------------------
+*.cover
+
+# ----------------------
+# Docker
+# ----------------------
+**/data/
+**/pgdata/
+docker/pg*_data/
+docker/pgdata/
+docker/.dockerignore
+
+# ----------------------
+# OS / Editor junk
+# ----------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ----------------------
+# Logs
+# ----------------------
+*.log

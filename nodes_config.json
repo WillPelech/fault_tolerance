@@ -1,0 +1,20 @@
+{
+  "nodes":{
+    "node_1":{
+    "port":"5432",
+    "role":"leader",
+  },
+    "node_2":{
+    "port":"5433",
+    "role":"follower",
+  },
+  "node_3"":{
+    "port":"5433",
+    "role":"follower",
+  }
+
+
+
+
+  }
+}

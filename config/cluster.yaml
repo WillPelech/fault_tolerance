@@ -1,0 +1,65 @@
+# config/cluster.yaml
+project:
+  name: kvft                      # used as docker compose project name (-p kvft)
+  network: kvft-net               # docker network name (optional)
+  data_dir: ./data                # where volumes/data map on host (optional)
+  image: kvft-node:local          # node service image tag (built by compose)
+
+cluster:
+  replication:
+    commit_quorum: 2              # 2 of 3 acks (leader counts as 1)
+    mode: leader_only_reads       # reads only from leader
+  timeouts_ms:
+    rpc_timeout: 300              # leader->follower append timeout
+    heartbeat: 1000               # optional (if you add heartbeats later)
+
+postgres:
+  version: "16"                   # postgres docker image tag
+  user: kv
+  password: kv
+  database: kv
+  port_base: 5400                 # host ports become 5401, 5402, 5403...
+  # If you don't want host-exposed DB ports, set expose_to_host: false
+  expose_to_host: true
+
+nodes:
+  - id: 1
+    name: node1
+    role: leader
+    port: 8001
+    postgres:
+      service: pg1                # docker service name in compose
+      db_name: kv
+    peers:
+      - http://node2:8002
+      - http://node3:8003
+
+  - id: 2
+    name: node2
+    role: follower
+    port: 8002
+    postgres:
+      service: pg2
+      db_name: kv
+    leader: http://node1:8001
+
+  - id: 3
+    name: node3
+    role: follower
+    port: 8003
+    postgres:
+      service: pg3
+      db_name: kv
+    leader: http://node1:8001
+
+demo:
+  fault_scenarios:
+    - name: kill_follower_2
+      action: stop
+      target: node2
+    - name: restart_follower_2
+      action: start
+      target: node2
+  smoke_test:
+    leader_url: http://localhost:8001
+    operations: 25                # how many INCRs your script should run
