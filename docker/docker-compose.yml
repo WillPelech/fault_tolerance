@@ -32,7 +32,7 @@ services:
   node1:
     build:
       context: ..
-      dockerfile: docker/node1/Dockerfile
+      dockerfile: Dockerfile
     environment:
       NODE_ID: "1"
       ROLE: "leader"
@@ -47,7 +47,7 @@ services:
   node2:
     build:
       context: ..
-      dockerfile: docker/node2/Dockerfile
+      dockerfile: Dockerfile
     environment:
       NODE_ID: "2"
       ROLE: "follower"
@@ -62,7 +62,7 @@ services:
   node3:
     build:
       context: ..
-      dockerfile: docker/node3/Dockerfile
+      dockerfile: Dockerfile
     environment:
       NODE_ID: "3"
       ROLE: "follower"
